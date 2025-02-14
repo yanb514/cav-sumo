@@ -6,7 +6,7 @@ Example of using TRACI/SUMOLIB for overriding acceleration behavior of certain a
 
 <!-- Requires **I24scenario/** folder to be populated from other project <https://github.com/yanb514/CorridorCalibration> -->
 
-Requires shared library **.so / .dll** files to be generated from other project <https://github.com/tylerard33/cav_codegen_examples> and needs the accompanying **cwrapper.py** and **cppwrapper.py** interfaces
+Requires shared library **.so / .dll** files to be generated from another project <https://github.com/tylerard33/cav_codegen_examples> and needs the accompanying **cwrapper.py** and **cppwrapper.py** interfaces. To run, pull these files into the current working directory
 
 ## TODO Microsim
 Add traffic light scenario - base it on Peachtree and Chicago connected corridor locations and timings
@@ -18,6 +18,7 @@ Add microsim Quality Control script
 Add microsim result analysis script
 
 Add mixed traffic scenarios
+
 Add a scripted way to adjust the scenario CAV penetration rate
 
 ## TODO XIL Testing
