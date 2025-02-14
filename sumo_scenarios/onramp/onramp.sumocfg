@@ -4,7 +4,6 @@
     <input>
         <net-file value="onramp.net.xml"/>
         <route-files value="onramp.rou.xml"/>
-        <additional-files value="detectors.add.xml"/>
     </input>
 
     <time>

@@ -13,7 +13,7 @@ import numpy as np
 
 from _settings import *
 from _cppwrapper import cpp_api
-from _cwrapper import c_api
+# from _cwrapper import c_api
 
 class _vehicle:
     '''Virtual vehicle super class'''

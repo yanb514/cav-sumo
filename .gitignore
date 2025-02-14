@@ -6,10 +6,13 @@
 _cppwrapper.py
 _cwrapper.py
 
-sumo_scenarios/I24/*.xml
-!sumo_scenarios/I24/I24_RDS.add.xml
-!sumo_scenarios/I24/I24_scenario.net.xml
-!sumo_scenarios/I24/I24_scenario.rou.xml
+# sumo_scenarios/i24/*.xml
+# !sumo_scenarios/i24/I24_RDS.add.xml
+# !sumo_scenarios/I24/I24_scenario.net.xml
+# !sumo_scenarios/I24/I24_scenario.rou.xml
+
+*.out.xml
+**/*fcd.xml
 
 # Folders to ignore
 __pycache__/

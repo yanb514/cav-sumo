@@ -17,9 +17,9 @@ Add microsim Quality Control script
 
 Add microsim result analysis script
 
-Add mixed traffic scenarios
+Add mixed traffic scenarios (done through adjusting CAV penetration rate)
 
-Add a scripted way to adjust the scenario CAV penetration rate
+Add a scripted way to adjust the scenario CAV penetration rate (done)
 
 ## TODO XIL Testing
 (Optional but nice to have) Add a scripted way to adjust the traffic light positions and timings

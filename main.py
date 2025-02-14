@@ -6,7 +6,6 @@
 ### Vehicle Mobility Systems Group  ###
 ### tard(at)anl(dot)gov             ###
 #######################################
-
 ### https://sumo.dlr.de/docs/Tutorials/Hello_SUMO.html
 
 # Running microsimulations
@@ -25,6 +24,11 @@
 ### https://sumo.dlr.de/docs/netconvert.html
 ### https://sumo.dlr.de/docs/Netedit/index.html
 
+'''
+YW [02/14/2025]
+1. add setting CAV penetration rate function in sumoAPI
+2. set scenarios in sumoAPI
+'''
 import numpy as np
 import time
 import os
@@ -37,6 +41,7 @@ import libsumo as traci # libsumo is faster but no GUI support and select API op
 
 from _settings import *
 from _agents import PCC
+import scripts.utils_data_read as reader
 
 # -------------------------------------------------------------------------------------------------------
 
@@ -53,6 +58,14 @@ class sumoAPI():
         parser.add_argument('--realtime',
                             help='Flag to run real-time SUMO simulation. Default false so as to compute sim as fast as possible.', 
                             default=False, action='store_true')
+        
+        parser.add_argument('--scenario',
+                            help='Select SUMO scenarios: ["onramp", "i24"].', 
+                            default="onramp", action='store_true')
+        
+        parser.add_argument('--penetration',
+                    help='Set CAV penetration rate w.r.t total flow, between 0 to 1', 
+                    default=0.3, action='store_true')
 
         args = parser.parse_args()
 
@@ -78,7 +91,7 @@ class sumoAPI():
         if not os.path.exists(SUMO_OUT_DIR): # Make the data directory if it does not exist
             os.makedirs(SUMO_OUT_DIR)
         
-        SUMO_CFG_FILE = "sumo_scenarios/I24/I24_scenario.sumocfg"
+        SUMO_CFG_FILE = f"sumo_scenarios/{args.scenario}/{args.scenario}.sumocfg"
         SUMO_OUT_FILE = os.path.join(SUMO_OUT_DIR, "fcd.xml")
 
         if args.gui: # GUI is requested and traci is imported - libsumo does not support GUI
@@ -95,11 +108,18 @@ class sumoAPI():
             # Additional commands that override the .sumocfg
             '--fcd-output', SUMO_OUT_FILE, # Log floating car data every simulation step
             '--fcd-output.acceleration', # Add acceleration to output
-
             '--step-log.period', '50', # Every n simulation steps TRACI output to command line
-            '--step-length', str(self.dt) # [s] Time interval between simulation steps
+            '--step-length', str(self.dt), # [s] Time interval between simulation steps
+            # '--no-step-log',  
+            # '--xml-validation', 'never', 
+            '--lateral-resolution', '0.5' # specify when using sublane model
         ]
 
+        # Modify flow according to penetration rate
+        reader.update_flows(penetration_rate=args.penetration, 
+                            input_file=f"sumo_scenarios/{args.scenario}/{args.scenario}_template.rou.xml", 
+                            output_file=f"sumo_scenarios/{args.scenario}/{args.scenario}.rou.xml")
+        
         print(f'Starting SUMO with configuration file: {SUMO_CFG_FILE}.')
         print(f'Outputting additional SUMO data to file: {SUMO_OUT_FILE}.')
 
@@ -126,7 +146,7 @@ class sumoAPI():
         # Get vehicle data
         vehicle_ids = traci.vehicle.getIDList()
 
-        type_gen = (ego_id for ego_id in vehicle_ids if traci.vehicle.getTypeID(ego_id) == 'trial') # Generator to get vehicles that match a given vType string
+        type_gen = (ego_id for ego_id in vehicle_ids if traci.vehicle.getTypeID(ego_id) == 'cav') # Generator to get vehicles that match a given vType string
         for ego_id in type_gen:
             ## Get ego states
             ego_distance = traci.vehicle.getDistance(ego_id) # From starting point - TODO behavior if multiple starting points?
@@ -169,7 +189,7 @@ class sumoAPI():
         self.rate()
 
         ### Print output
-        if fmod(sim_time, 1) == 0: # Print output every n seconds of simulation time
+        if fmod(sim_time, 10) == 0: # Print output every n seconds of simulation time
             print('t: {:0.1f}'.format(sim_time))
 
     def rate(self):
@@ -191,6 +211,8 @@ class sumoAPI():
 # -------------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    # Set CAV penetration rate
+
     # Run simulation
     sumo = sumoAPI()
     sumo.sim()
